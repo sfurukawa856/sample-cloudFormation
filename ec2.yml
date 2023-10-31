@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create ec2
+
+Parameters:
+  AppName:
+    Type: String
+    Default: sample-app
+
+  KeyName:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: "AWS::EC2::KeyPair::KeyName"
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+
+  MyIP:
+    Type: String
+    Description: my changing ip
+
+Resources:
+  EC2Instance1a:
+    Type: AWS::EC2::Instance
+    Properties:
+      AdditionalInfo: test instance
+      IamInstanceProfile:
+        { "Fn::ImportValue": !Sub "${AppName}-Ec2Role-Profile" }
+      ImageId: ami-0d48337b7d3c86f62
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - GroupSet:
+            - !Ref SSHSecurityGroup
+            - !Ref HTTPSecurityGroup
+          DeviceIndex: 0
+          SubnetId: { "Fn::ImportValue": !Sub "${AppName}-PublicSubnet1a" }
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-ec2-1a
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-ssh-sg
+      GroupDescription: Enable SSH access via port 22
+      VpcId: { "Fn::ImportValue": !Sub "${AppName}-VpcId" }
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-http-sg
+      GroupDescription: HTTP access port 80
+      VpcId: { "Fn::ImportValue": !Sub "${AppName}-VpcId" }
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIP

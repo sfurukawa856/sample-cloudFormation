@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create RDS
+
+Parameters:
+  AppName:
+    Type: String
+    Default: udemy-aws-container
+
+Resources:
+  # ------------
+  # Security Group
+  # ------------
+  RdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for RDS
+      GroupName: !Sub SubnetGroup
+      VpcId:
+        Fn::ImportValue: !Sub ${AppName}-VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: "3306"
+          ToPort: "3306"
+          CidrIp: 10.0.0.0/16
+      Tags:
+        Key: Name
+        Value:
+
+  SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: SubnetGroup for rds
+      DBSubnetGroupName: !Sub ${AppName}-subnet-group
+      SubnetIds:
+        - String
+      Tags:
+        - Tag

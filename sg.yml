@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create security group
+
+Parameters:
+  AppName:
+    Type: String
+    Default: sample-app
+
+  MyIP:
+    Type: String
+    Description: my changing ip
+
+Resources:
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-ssh-sg
+      GroupDescription: Enable SSH access via port 22
+      VpcId: { "Fn::ImportValue": !Sub "${AppName}-VpcId" }
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-http-sg
+      GroupDescription: HTTP access port 80
+      VpcId: { "Fn::ImportValue": !Sub "${AppName}-VpcId" }
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIP
+
+Outputs:
+  SSHSecurityGroup:
+    Value: !Ref SSHSecurityGroup
+    Export:
+      Name: !Sub ${AppName}-ssh-sg
+
+  HTTPSecurityGroup:
+    Value: !Ref HTTPSecurityGroup
+    Export:
+      Name: !Sub ${AppName}-http-sg

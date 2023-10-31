@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create iam
+
+Parameters:
+  AppName:
+    Type: String
+    Default: sample-app
+
+Resources:
+  Ec2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Description: for ec2
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonRDSDataFullAccess"
+      RoleName: !Sub ${AppName}-Ec2Role
+
+  Ec2RoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${AppName}-Ec2Role-Profile
+      Path: /
+      Roles:
+        - Ref: "Ec2Role"
+
+Outputs:
+  Ec2RoleId:
+    Value: !Ref Ec2Role
+    Export:
+      Name: !Sub ${AppName}-Ec2Role
+
+  Ec2RoleProfile:
+    Value: !Ref Ec2RoleProfile
+    Export:
+      Name: !Sub ${AppName}-Ec2Role-Profile

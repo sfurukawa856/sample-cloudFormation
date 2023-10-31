@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create vpc subnet route-table igw
+Parameters:
+  AppName:
+    Type: String
+    Default: sample-app
+
+Resources:
+  # ------------
+  # VPC
+  # ------------
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-vpc
+
+  # ------------
+  # PublicSubnet
+  # ------------
+  PublicSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.0.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-public1-ap-northeast-1a
+      VpcId: !Ref VPC
+
+  PublicSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.16.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-public2-ap-northeast-1c
+      VpcId: !Ref VPC
+
+  PublicSubnet1d:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: 10.0.32.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-public3-ap-northeast-1d
+      VpcId: !Ref VPC
+
+  # ------------
+  # PrivateSubnet
+  # ------------
+  PrivateSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.128.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-private1-ap-northeast-1a
+      VpcId: !Ref VPC
+
+  PrivateSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.144.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-private2-ap-northeast-1c
+      VpcId: !Ref VPC
+
+  PrivateSubnet1d:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: 10.0.160.0/20
+      EnableDns64: false
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-subnet-private3-ap-northeast-1d
+      VpcId: !Ref VPC
+
+  # ------------
+  # PublicRouteTable
+  # ------------
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-rtb-public
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+
+  # ------------
+  # PrivateRouteTable
+  # ------------
+  PrivateRouteTable1a:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-rtb-private1-ap-northeast-1a
+      VpcId: !Ref VPC
+
+  PrivateRouteTable1c:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-rtb-private1-ap-northeast-1c
+      VpcId: !Ref VPC
+
+  PrivateRouteTable1d:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-rtb-private1-ap-northeast-1d
+      VpcId: !Ref VPC
+
+  PublicRouteTableAssociation1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1a
+
+  PublicRouteTableAssociation1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1c
+
+  PublicRouteTableAssociation1d:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1d
+
+  PrivateRouteTableAssociation1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1a
+      SubnetId: !Ref PrivateSubnet1a
+
+  PrivateRouteTableAssociation1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1c
+      SubnetId: !Ref PrivateSubnet1c
+
+  PrivateRouteTableAssociation1d:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1d
+      SubnetId: !Ref PrivateSubnet1d
+
+  # ------------
+  # InternetGateway
+  # ------------
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-igw
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export:
+      Name: !Sub ${AppName}-VpcId
+
+  PublicSubnet1a:
+    Value: !Ref PublicSubnet1a
+    Export:
+      Name: !Sub ${AppName}-PublicSubnet1a
