@@ -65,3 +65,14 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: !Ref MyIP
+# 課金が発生するのでコメントアウト
+# EIP1a:
+#   Type: AWS::EC2::EIP
+#   Properties:
+#     Domain: vpc
+#     InstanceId: !Ref EC2Instance1a
+#     NetworkBorderGroup: ap-northeast-1
+#     PublicIpv4Pool: amazon
+#     Tags:
+#       - Key: Name
+#         Value: !Sub ${AppName}-ec2-1a
