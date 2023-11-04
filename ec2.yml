@@ -41,6 +41,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${AppName}-ec2-1a
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum install httpd -y
+          systemctl start httpd
+          systemctl enable httpd
 
   SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup
