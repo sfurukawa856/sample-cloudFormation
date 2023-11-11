@@ -205,3 +205,28 @@ Outputs:
     Value: !Ref PublicSubnet1a
     Export:
       Name: !Sub ${AppName}-PublicSubnet1a
+
+  PublicSubnet1c:
+    Value: !Ref PublicSubnet1c
+    Export:
+      Name: !Sub ${AppName}-PublicSubnet1c
+
+  PublicSubnet1d:
+    Value: !Ref PublicSubnet1d
+    Export:
+      Name: !Sub ${AppName}-PublicSubnet1d
+
+  PrivateSubnet1a:
+    Value: !Ref PrivateSubnet1a
+    Export:
+      Name: !Sub ${AppName}-PrivateSubnet1a
+
+  PrivateSubnet1c:
+    Value: !Ref PrivateSubnet1c
+    Export:
+      Name: !Sub ${AppName}-PrivateSubnet1c
+
+  PrivateSubnet1d:
+    Value: !Ref PrivateSubnet1d
+    Export:
+      Name: !Sub ${AppName}-PrivateSubnet1d

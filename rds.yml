@@ -4,34 +4,34 @@ Description: create RDS
 Parameters:
   AppName:
     Type: String
-    Default: udemy-aws-container
+    Default: sample-app
 
 Resources:
-  # ------------
-  # Security Group
-  # ------------
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t2.micro
+      AllocatedStorage: 20
+      DBName: MyDatabase
+      Engine: MySQL
+      EngineVersion: "8.0.33"
+      MasterUsername: sampleAppAdmin
+      MasterUserPassword: nZS3mLpmmjH6
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
   RdsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security Group for RDS
-      GroupName: !Sub SubnetGroup
-      VpcId:
-        Fn::ImportValue: !Sub ${AppName}-VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: "3306"
-          ToPort: "3306"
-          CidrIp: 10.0.0.0/16
-      Tags:
-        Key: Name
-        Value:
+      GroupName: !Sub ${AppName}-rds-sg
+      VpcId: { "Fn::ImportValue": !Sub "${AppName}-VpcId" }
 
-  SubnetGroup:
+  DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: SubnetGroup for rds
       DBSubnetGroupName: !Sub ${AppName}-subnet-group
       SubnetIds:
-        - String
-      Tags:
-        - Tag
+        - { "Fn::ImportValue": !Sub "${AppName}-PrivateSubnet1a" }
+        - { "Fn::ImportValue": !Sub "${AppName}-PrivateSubnet1c" }
+        - { "Fn::ImportValue": !Sub "${AppName}-PrivateSubnet1d" }
